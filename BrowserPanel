@@ -1,0 +1,71 @@
+package com.HIS.view;
+
+import java.awt.BorderLayout;
+import java.awt.CardLayout;
+import java.awt.FlowLayout;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+
+import com.HIS.Controller.DoctorTableModel;
+
+public class BrowserPanel extends JPanel {
+	JTable doctorTable;
+    public BrowserPanel(CardLayout cardLayout, JPanel container, DoctorTableModel tableModel,JTable doctorTable) {
+        setLayout(new BorderLayout(10, 10));
+        setBorder(BorderFactory.createTitledBorder("Doctor Browser"));
+
+        //JTable doctorTable = new JTable(tableModel);
+        JScrollPane scrollPane = new JScrollPane(doctorTable);
+        add(scrollPane, BorderLayout.CENTER);
+
+        JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 10));
+        searchPanel.add(new JLabel("Name:"));
+        JTextField nameSearchField = new JTextField(15);
+        searchPanel.add(nameSearchField);
+
+        
+        searchPanel.add(new JLabel("Department:"));
+        JTextField departmentSearchField = new JTextField(15);
+        searchPanel.add(departmentSearchField);
+
+        JButton searchButton = new JButton("Search");
+        searchButton.addActionListener(e -> {
+            String nameQuery = nameSearchField.getText().trim().toLowerCase();
+            String departmentQuery = departmentSearchField.getText().trim().toLowerCase();
+
+            if (!nameQuery.isEmpty() && !departmentQuery.isEmpty()) {
+                tableModel.filterByNameAndDepartment(nameQuery, departmentQuery);
+            } else if (!nameQuery.isEmpty()) {
+                tableModel.filterByName(nameQuery);
+            } else if (!departmentQuery.isEmpty()) {
+                tableModel.filterByDepartment(departmentQuery);
+            } else {
+                tableModel.resetFilter();
+            }
+        });
+
+
+        JButton resetButton = new JButton("Reset");
+        resetButton.addActionListener(e -> {
+        	nameSearchField.setText("");
+        	departmentSearchField.setText("");
+            tableModel.resetFilter();
+        });
+        searchPanel.add(searchButton);
+        searchPanel.add(resetButton);
+        add(searchPanel, BorderLayout.NORTH);
+
+        JButton goToProfileButton = new JButton("Go to Profile Page");
+        goToProfileButton.addActionListener(e -> cardLayout.show(container, "Profile"));
+        add(goToProfileButton, BorderLayout.SOUTH);
+        
+    }
+}
